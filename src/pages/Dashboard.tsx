@@ -24,9 +24,15 @@ const Dashboard = () => {
         {/* Main nav */}
         <nav className="sidebar-nav">
           <p className="nav-group-title">MAIN</p>
-          <NavLink to="/admin/dashboard" end className="nav-item">Overview</NavLink>
-          <NavLink to="/admin/dashboard/leads"   className="nav-item">Freelance Leads</NavLink>
-          <NavLink to="/admin/dashboard/content" className="nav-item">CHHAVA.AI Content</NavLink>
+          <NavLink to="/admin/dashboard" end className="nav-item">
+            <span className="nav-icon">📊</span> <span className="nav-text">Overview</span>
+          </NavLink>
+          <NavLink to="/admin/dashboard/leads" className="nav-item">
+            <span className="nav-icon">💼</span> <span className="nav-text">Leads</span>
+          </NavLink>
+          <NavLink to="/admin/dashboard/content" className="nav-item">
+            <span className="nav-icon">📱</span> <span className="nav-text">Content</span>
+          </NavLink>
         </nav>
 
         {/* Footer manage links */}
@@ -35,27 +41,27 @@ const Dashboard = () => {
 
           {/* Profile → /admin/dashboard/settings */}
           <NavLink to="/admin/dashboard/settings" className="footer-nav-btn">
-            <span className="footer-btn-icon">👤</span> Profile
+            <span className="footer-btn-icon">👤</span> <span className="nav-text">Profile</span>
           </NavLink>
 
           {/* Projects → /admin/dashboard/projects */}
           <NavLink to="/admin/dashboard/projects" className="footer-nav-btn footer-nav-btn--projects">
-            <span className="footer-btn-icon">🗂️</span> Projects
+            <span className="footer-btn-icon">🗂️</span> <span className="nav-text">Projects</span>
           </NavLink>
 
           {/* Skills → /admin/dashboard/skills */}
           <NavLink to="/admin/dashboard/skills" className="footer-nav-btn footer-nav-btn--skills">
-            <span className="footer-btn-icon">⚡</span> Skills
+            <span className="footer-btn-icon">⚡</span> <span className="nav-text">Skills</span>
           </NavLink>
 
           {/* Certificates → /admin/dashboard/certificates */}
           <NavLink to="/admin/dashboard/certificates" className="footer-nav-btn footer-nav-btn--certs">
-            <span className="footer-btn-icon">🎓</span> Certificates
+            <span className="footer-btn-icon">🎓</span> <span className="nav-text">Certificates</span>
           </NavLink>
 
           {/* Logout */}
           <button className="logout-btn" onClick={handleLogout}>
-            <span className="footer-btn-icon">🔐</span> Logout
+            <span className="footer-btn-icon">🔐</span> <span className="nav-text">Logout</span>
           </button>
         </div>
       </aside>
@@ -151,8 +157,11 @@ const Dashboard = () => {
           font-weight: 500;
           font-size: 14px;
           transition: all 0.18s ease;
-          display: block;
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
+        .nav-icon { font-size: 14px; flex-shrink: 0; }
         .nav-item:hover { background: var(--li-bg); color: var(--li-text-main); }
         .nav-item.active {
           background: rgba(55, 215, 250, 0.10);
@@ -275,31 +284,59 @@ const Dashboard = () => {
 
         .content-wrapper { padding: 40px 48px; position: relative; z-index: 10; }
 
-        /* ── Responsive ── */
+        /* ── Responsive Mobile Bottom Bar ── */
         @media (max-width: 768px) {
           .dashboard-container { flex-direction: column; }
+          
+          /* Transform sidebar to fixed bottom glass bar */
           .sidebar {
             width: 100%; height: auto; border-right: none;
-            border-bottom: 1px solid var(--li-border);
-            position: relative; padding: 16px; overflow-y: visible;
+            position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--li-border);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+            display: flex; flex-direction: row; justify-content: space-evenly; align-items: center;
+            z-index: 1000; overflow: visible;
           }
-          .sidebar-footer {
-            flex-direction: row; flex-wrap: wrap;
-            padding: 12px 0 0 0; margin-top: 0; gap: 5px;
+
+          /* Hide unneeded elements on mobile */
+          .sidebar-header, .nav-group-title { display: none; }
+
+          /* Magic layout trick: makes list items direct flex children of sidebar */
+          .sidebar-nav, .sidebar-footer { display: contents; }
+
+          /* Style the individual buttons as icons only */
+          .nav-item, .footer-nav-btn, .logout-btn {
+            width: auto; min-width: 44px; padding: 6px; margin: 0;
+            border: none; background: transparent !important;
+            flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: none !important;
           }
-          .footer-nav-btn, .logout-btn {
-            width: auto; flex: 1; min-width: 70px; justify-content: center;
-            padding: 8px 8px; font-size: 12px;
+          
+          .nav-text { display: none; }
+          
+          .nav-icon, .footer-btn-icon {
+            font-size: 22px; margin: 0;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           }
-          .footer-btn-icon { font-size: 13px; }
-          .content-wrapper { padding: 24px 16px; }
+
+          /* Mobile Active State Icon Pop */
+          .nav-item.active .nav-icon, 
+          .footer-nav-btn.active .footer-btn-icon {
+            transform: translateY(-4px) scale(1.15);
+            filter: drop-shadow(0 4px 6px rgba(62, 24, 249, 0.3));
+          }
+
+          .content-wrapper { padding: 24px 16px 100px; } /* Prevent content from hiding behind the bottom nav */
           .glow-cyan { top:-50px; right:-50px; width:300px; height:300px; }
         }
 
         @media (max-width: 480px) {
-          .content-wrapper { padding: 18px 12px; }
-          .footer-nav-btn, .logout-btn { font-size: 11px; padding: 7px 6px; gap: 4px; }
-          .footer-btn-icon { display: none; }
+          .content-wrapper { padding: 18px 12px 90px; }
+          .nav-icon, .footer-btn-icon { font-size: 20px; }
         }
       `}</style>
     </div>

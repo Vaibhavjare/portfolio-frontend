@@ -1,12 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-
-
-/* ── Admin Components Imports ── */
-import DashboardOverview from "../components/admin/DashboardOverview";
-import ProjectManagement from "../components/admin/ProjectManagement";
-import SkillManagement from "../components/admin/SkillManagement";
-import CertificatesManager from "../components/admin/Certificatesmanager";
-import ProfileSettings from "../components/admin/ProfileSettings";
+import { Link } from "react-router-dom";
 
 /* ── API hooks ── */
 import { useGetProfileQuery }      from "../redux/services/profileApi";
@@ -181,14 +174,8 @@ const PROF_COLOR: Record<string, string> = {
    HOME PAGE
 ══════════════════════════════════════════════════════════ */
 const Home: React.FC = () => {
-  /* ── State ── */
   const [scrolled,      setScrolled]      = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  
-  // Tab/View Mode State to show Admin Imports seamlessly
-  const [viewMode, setViewMode] = useState<"public" | "admin">("public");
-  const [adminTab, setAdminTab] = useState<"dashboard" | "projects" | "skills" | "certs" | "profile">("dashboard");
-
   const heroRef = useRef<HTMLDivElement>(null);
 
   /* ── API data ── */
@@ -314,12 +301,12 @@ const Home: React.FC = () => {
       {/* ═══════════ NAVBAR ═══════════ */}
       <header className={`top-navbar${scrolled ? " scrolled" : ""}`}>
         <div className="nav-container">
-          <a href="#home" className="nav-brand" onClick={() => setViewMode("public")}>
+          <a href="#home" className="nav-brand">
             <span className="font-extrabold gradient-text">{firstName}</span>
             <span className="mono-text logo-suffix">.dev</span>
           </a>
           <nav className="desktop-nav">
-            {viewMode === "public" && (
+            {(
               [
                 ["#about",        "About"],
                 ["#skills",       "Skills"],
@@ -345,664 +332,619 @@ const Home: React.FC = () => {
               CHHAVA.AI <span className="nav-badge">Educator</span>
             </a>
             
-            {/* View Mode Toggle button replacing standard link so Admin Sections render beautifully inside */}
-            <button 
-              onClick={() => setViewMode(v => v === "public" ? "admin" : "public")} 
-              className="nav-link admin-link"
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
-            >
-              {viewMode === "public" ? "Admin Mode" : "Portfolio Mode"}
-            </button>
+            {/* The Link to the Admin route is correctly restored here */}
+            <Link to="/admin/login" className="nav-link admin-link">Admin</Link>
+            
             <a href="#contact" className="primary-btn nav-btn">Let's Talk</a>
           </nav>
         </div>
       </header>
 
-      {/* ═══════════ AURORA BACKGROUND (Stays exactly the same) ═══════════ */}
+      {/* ═══════════ AURORA BACKGROUND ═══════════ */}
       <div className="aurora-container" aria-hidden="true">
         <div className="glow glow-cyan"   />
         <div className="glow glow-purple" />
         <div className="glow glow-pink"   />
       </div>
 
-      {viewMode === "admin" ? (
-        /* ═══════════════════════════════════════════════════
-           IMPORTED ADMIN SECTIONS (Same UI/Theme Integration)
-        ═══════════════════════════════════════════════════ */
-        <section className="section" style={{ paddingTop: "140px", minHeight: "100vh" }}>
-          {/* Glassmorphism Tab Pill to switch Admin Views */}
-          <div className="admin-nav-pill">
-            {[
-              { id: "dashboard", label: "Overview", component: <DashboardOverview /> },
-              { id: "projects",  label: "Projects", component: <ProjectManagement /> },
-              { id: "skills",    label: "Skills",   component: <SkillManagement /> },
-              { id: "certs",     label: "Certs",    component: <CertificatesManager /> },
-              { id: "profile",   label: "Profile",  component: <ProfileSettings /> },
-            ].map(sec => (
-              <button 
-                key={sec.id} 
-                onClick={() => setAdminTab(sec.id as any)} 
-                className={`admin-tab-btn ${adminTab === sec.id ? 'active' : ''}`}
-              >
-                {sec.label}
-              </button>
-            ))}
-          </div>
+      {/* ═══════════════════════════════════════════════════
+         HERO
+      ═══════════════════════════════════════════════════ */}
+      <section id="home" className="hero">
+        <div ref={heroRef} className="hero-content">
 
-          {/* Admin Glass Panel Wrapper for the imported sections */}
-          <div className="admin-glass-card" style={{ width: "100%", maxWidth: 1200 }}>
-            {adminTab === "dashboard" && <DashboardOverview />}
-            {adminTab === "projects"  && <ProjectManagement />}
-            {adminTab === "skills"    && <SkillManagement />}
-            {adminTab === "certs"     && <CertificatesManager />}
-            {adminTab === "profile"   && <ProfileSettings />}
-          </div>
-        </section>
-      ) : (
-        /* ═══════════════════════════════════════════════════
-           PUBLIC PORTFOLIO VIEW
-        ═══════════════════════════════════════════════════ */
-        <>
-          {/* ═══════════════════════════════════════════════════
-             HERO
-          ═══════════════════════════════════════════════════ */}
-          <section id="home" className="hero">
-            <div ref={heroRef} className="hero-content">
-              {/* Left text */}
-              <div className="hero-text">
-                <div className="tagline-badge">
-                  <span className="dot" />
-                  {expYrs > 0 ? `${expYrs}+ years of experience` : "Available for work"}
-                </div>
-                <h1>
-                  Hi, I'm{" "}
-                  <span className="gradient-text">{firstName}</span>
-                  <br />
-                  <span className="hero-title-line">{title}</span>
-                </h1>
-                <p className="subtitle">{bio}</p>
-
-                <div className="hero-social-row">
-                  {github && (
-                    <a href={github} target="_blank" rel="noreferrer" className="social-chip">
-                      <GhIcon /> GitHub
-                    </a>
-                  )}
-                  {linkedin && (
-                    <a href={linkedin} target="_blank" rel="noreferrer" className="social-chip">
-                      <LiIcon /> LinkedIn
-                    </a>
-                  )}
-                </div>
-
-                <div className="buttons">
-                  <a href="#portfolio" className="primary-btn">View My Work</a>
-                  {resumeUrl
-                    ? <a href={resumeUrl} target="_blank" rel="noreferrer" className="outline-btn">Download Resume</a>
-                    : <a href="#contact" className="outline-btn">Get In Touch</a>
-                  }
-                </div>
-
-                {/* Quick stats */}
-                {(allProjects.length > 0 || allSkills.length > 0) && (
-                  <div className="hero-stats">
-                    {allProjects.length > 0 && (
-                      <div className="hero-stat">
-                        <span className="hero-stat-num gradient-text">
-                          <Counter to={allProjects.length} suffix="+" />
-                        </span>
-                        <span className="hero-stat-lbl">Projects</span>
-                      </div>
-                    )}
-                    {allSkills.length > 0 && (
-                      <div className="hero-stat">
-                        <span className="hero-stat-num gradient-text">
-                          <Counter to={allSkills.length} suffix="+" />
-                        </span>
-                        <span className="hero-stat-lbl">Skills</span>
-                      </div>
-                    )}
-                    {expYrs > 0 && (
-                      <div className="hero-stat">
-                        <span className="hero-stat-num gradient-text">
-                          <Counter to={expYrs} suffix="+" />
-                        </span>
-                        <span className="hero-stat-lbl">Years Exp</span>
-                      </div>
-                    )}
-                    {allCerts.length > 0 && (
-                      <div className="hero-stat">
-                        <span className="hero-stat-num gradient-text">
-                          <Counter to={allCerts.length} />
-                        </span>
-                        <span className="hero-stat-lbl">Certs</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Right — 3D profile card */}
-              <div className="hero-visual">
-                <div className="hero-3d-scene">
-                  <FloatingOrb size={220} color="#3E18F9" top="-10%" left="-15%" delay={0}   duration={6} />
-                  <FloatingOrb size={160} color="#37D7FA" top="55%"  left="65%"  delay={1.5} duration={7} />
-                  <FloatingOrb size={100} color="#FF8DF2" top="15%"  left="70%"  delay={0.8} duration={5} />
-
-                  <TiltCard className="profile-3d-card">
-                    <div className="profile-card-glow" aria-hidden="true" />
-                    {photoUrl ? (
-                      <img src={photoUrl} alt={name} className="profile-card-photo" />
-                    ) : (
-                      <div className="profile-card-placeholder" aria-hidden="true">
-                        <span>{firstName.charAt(0)}</span>
-                      </div>
-                    )}
-                    <div className="profile-card-info">
-                      <p className="profile-card-name">{name}</p>
-                      <p className="profile-card-title">{title}</p>
-                      {profile?.location && (
-                        <p className="profile-card-loc">📍 {profile.location}</p>
-                      )}
-                    </div>
-                    <div className="float-badge float-badge-1">⚡ {allSkills.length} Skills</div>
-                    <div className="float-badge float-badge-2">🚀 {allProjects.length} Projects</div>
-                    {allCerts.length > 0 && (
-                      <div className="float-badge float-badge-3">🎓 {allCerts.length} Certs</div>
-                    )}
-                  </TiltCard>
-                </div>
-              </div>
+          {/* Left text */}
+          <div className="hero-text">
+            <div className="tagline-badge">
+              <span className="dot" />
+              {expYrs > 0 ? `${expYrs}+ years of experience` : "Available for work"}
             </div>
-          </section>
+            <h1>
+              Hi, I'm{" "}
+              <span className="gradient-text">{firstName}</span>
+              <br />
+              <span className="hero-title-line">{title}</span>
+            </h1>
+            <p className="subtitle">{bio}</p>
 
-          {/* ═══════════════════════════════════════════════════
-             ABOUT
-          ═══════════════════════════════════════════════════ */}
-          <section id="about" className="section">
-            <Reveal className="section-header">
-              <p className="section-eyebrow">WHO I AM</p>
-              <h2>About <span className="gradient-text">Me</span></h2>
-            </Reveal>
-
-            <div className="about-grid">
-              <Reveal delay={0.1} className="about-left">
-                {photoUrl && (
-                  <TiltCard className="about-photo-wrap">
-                    <img src={photoUrl} alt={name} className="about-photo" />
-                    {expYrs > 0 && (
-                      <div className="about-photo-badge">
-                        <span className="about-photo-num">{expYrs}+</span>
-                        <span>Years Exp</span>
-                      </div>
-                    )}
-                  </TiltCard>
-                )}
-              </Reveal>
-
-              <Reveal delay={0.2} className="about-right">
-                {profile?.objective && (
-                  <p className="about-objective">{profile.objective}</p>
-                )}
-                {profile?.bio && profile.bio !== profile.objective && (
-                  <p className="about-bio">{profile.bio}</p>
-                )}
-                <div className="about-details">
-                  {profile?.location && (
-                    <div className="about-detail-item">
-                      <span className="about-detail-icon">📍</span>
-                      <div>
-                        <span className="about-detail-lbl">Location</span>
-                        <span className="about-detail-val">{profile.location}</span>
-                      </div>
-                    </div>
-                  )}
-                  {profile?.email && (
-                    <div className="about-detail-item">
-                      <span className="about-detail-icon">✉️</span>
-                      <div>
-                        <span className="about-detail-lbl">Email</span>
-                        <a href={`mailto:${profile.email}`} className="about-detail-val about-detail-link">
-                          {profile.email}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                  {profile?.phone && (
-                    <div className="about-detail-item">
-                      <span className="about-detail-icon">📞</span>
-                      <div>
-                        <span className="about-detail-lbl">Phone</span>
-                        <span className="about-detail-val">{profile.phone}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {profile?.skills_summary && (
-                  <p className="about-skills-summary">{profile.skills_summary}</p>
-                )}
-                <div className="about-socials">
-                  {github   && <a href={github}   target="_blank" rel="noreferrer" className="social-pill">GitHub</a>}
-                  {linkedin && <a href={linkedin} target="_blank" rel="noreferrer" className="social-pill">LinkedIn</a>}
-                  {profile?.social_links?.twitter   && (
-                    <a href={profile.social_links.twitter}   target="_blank" rel="noreferrer" className="social-pill">Twitter</a>
-                  )}
-                  {profile?.social_links?.instagram && (
-                    <a href={profile.social_links.instagram} target="_blank" rel="noreferrer" className="social-pill">Instagram</a>
-                  )}
-                </div>
-              </Reveal>
-            </div>
-          </section>
-
-          {/* ═══════════════════════════════════════════════════
-             SKILLS
-          ═══════════════════════════════════════════════════ */}
-          <section id="skills" className="section bg-light-grey">
-            <Reveal className="section-header">
-              <p className="section-eyebrow">EXPERTISE</p>
-              <h2>Tech <span className="gradient-text">Stack</span></h2>
-              <p className="subtitle" style={{ margin: "12px auto 0" }}>
-                {activeSkills.length} skills across {Object.keys(skillsByCategory).length} categories
-              </p>
-            </Reveal>
-
-            {Object.keys(skillsByCategory).length > 0 ? (
-              Object.entries(skillsByCategory).map(([cat, skills], catIdx) => (
-                <Reveal key={cat} delay={catIdx * 0.08} style={{ width: "100%", maxWidth: 1100 }}>
-                  <div className="skill-category-block">
-                    <h3 className="skill-cat-title">{cat}</h3>
-                    <div className="skills-grid">
-                      {skills.map((s) => {
-                        const accent = s.color ?? PROF_COLOR[s.proficiency_level ?? ""] ?? "#3E18F9";
-                        return (
-                          <TiltCard key={s.skill_id} className="skill-badge-3d">
-                            <div
-                              className="skill-badge-inner"
-                              style={{ borderColor: `${accent}33` }}
-                            >
-                              {s.icon_url ? (
-                                <img src={s.icon_url} alt={s.name} className="skill-icon-img" />
-                              ) : (
-                                <span className="skill-icon-letter" style={{ color: accent }}>
-                                  {s.name.charAt(0)}
-                                </span>
-                              )}
-                              <span className="skill-badge-name">{s.name}</span>
-                              {s.rating != null && (
-                                <div className="skill-badge-bar-wrap">
-                                  <div
-                                    className="skill-badge-bar"
-                                    style={{
-                                      width: `${(s.rating / 10) * 100}%`,
-                                      background: accent,
-                                    }}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          </TiltCard>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </Reveal>
-              ))
-            ) : (
-              <div className="skills-grid" style={{ maxWidth: 1000 }}>
-                {activeSkills.map((s, i) => (
-                  <Reveal key={s.skill_id} delay={i * 0.04}>
-                    <div className="skill-badge">{s.name}</div>
-                  </Reveal>
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* ═══════════════════════════════════════════════════
-             PROJECTS - Right to Left Rotating Marquee 
-             Using YOUR exact 3D TiltCards
-          ═══════════════════════════════════════════════════ */}
-          <section id="portfolio" className="section">
-            <Reveal className="section-header">
-              <p className="section-eyebrow">WORK</p>
-              <h2>Featured <span className="gradient-text">Projects</span></h2>
-              <p className="subtitle" style={{ margin: "12px auto 0" }}>
-                {featuredProjects.length > 0
-                  ? `${featuredProjects.length} featured out of ${allProjects.length} total`
-                  : `${allProjects.length} projects`}
-              </p>
-            </Reveal>
-
-            <div className="marquee-viewport">
-              <div className="marquee-track">
-                
-                {/* We map twice back-to-back to create an infinite seamless loop */}
-                {[...displayProjects, ...displayProjects].map((p, i) => (
-                  <div key={`${p.project_id}-${i}`} className="marquee-item pop-in" style={{ animationDelay: `${(i % displayProjects.length) * 0.15}s` }}>
-                    <TiltCard className="project-card-3d" style={{ height: "100%" }}>
-                      {p.thumbnail_url ? (
-                        <div className="proj-thumb">
-                          <img src={p.thumbnail_url} alt={p.title} />
-                        </div>
-                      ) : (
-                        <div className="proj-thumb proj-thumb-placeholder">
-                          <span>💻</span>
-                        </div>
-                      )}
-
-                      <div className="proj-body">
-                        {p.complexity_score != null && (
-                          <span className={`proj-complexity ${cxClass(p.complexity_score)}`}>
-                            {cxLabel(p.complexity_score)}
-                          </span>
-                        )}
-
-                        <h3 className="proj-title">{p.title}</h3>
-                        {p.description && (
-                          <p className="proj-desc">{p.description}</p>
-                        )}
-
-                        {p.tech_stack && (
-                          <div className="proj-tech-row">
-                            {[
-                              ...(p.tech_stack.programming_languages ?? []),
-                              ...(p.tech_stack.frameworks ?? []),
-                            ]
-                              .slice(0, 5)
-                              .map((t) => (
-                                <span key={t} className="proj-tech-chip">{t}</span>
-                              ))}
-                          </div>
-                        )}
-
-                        {p.tags && p.tags.length > 0 && (
-                          <div className="proj-tags">
-                            {p.tags.slice(0, 4).map((t) => (
-                              <span key={t} className="proj-tag">{t}</span>
-                            ))}
-                          </div>
-                        )}
-
-                        <div className="proj-links">
-                          {p.github_link && (
-                            <a
-                              href={p.github_link}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="proj-link proj-link-gh"
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-                              </svg>
-                              Code
-                            </a>
-                          )}
-                          {p.live_demo_url && (
-                            <a
-                              href={p.live_demo_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="proj-link proj-link-live"
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                                <polyline points="15 3 21 3 21 9"/>
-                                <line x1="10" y1="14" x2="21" y2="3"/>
-                              </svg>
-                              Live Demo
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </TiltCard>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {allProjects.length > 6 && (
-              <Reveal delay={0.2} style={{ marginTop: 20 }}>
-                <a href="#contact" className="outline-btn">
-                  View All {allProjects.length} Projects →
+            <div className="hero-social-row">
+              {github && (
+                <a href={github} target="_blank" rel="noreferrer" className="social-chip">
+                  <GhIcon /> GitHub
                 </a>
-              </Reveal>
+              )}
+              {linkedin && (
+                <a href={linkedin} target="_blank" rel="noreferrer" className="social-chip">
+                  <LiIcon /> LinkedIn
+                </a>
+              )}
+            </div>
+
+            <div className="buttons">
+              <a href="#portfolio" className="primary-btn">View My Work</a>
+              {resumeUrl
+                ? <a href={resumeUrl} target="_blank" rel="noreferrer" className="outline-btn">Download Resume</a>
+                : <a href="#contact" className="outline-btn">Get In Touch</a>
+              }
+            </div>
+
+            {/* Quick stats */}
+            {(allProjects.length > 0 || allSkills.length > 0) && (
+              <div className="hero-stats">
+                {allProjects.length > 0 && (
+                  <div className="hero-stat">
+                    <span className="hero-stat-num gradient-text">
+                      <Counter to={allProjects.length} suffix="+" />
+                    </span>
+                    <span className="hero-stat-lbl">Projects</span>
+                  </div>
+                )}
+                {allSkills.length > 0 && (
+                  <div className="hero-stat">
+                    <span className="hero-stat-num gradient-text">
+                      <Counter to={allSkills.length} suffix="+" />
+                    </span>
+                    <span className="hero-stat-lbl">Skills</span>
+                  </div>
+                )}
+                {expYrs > 0 && (
+                  <div className="hero-stat">
+                    <span className="hero-stat-num gradient-text">
+                      <Counter to={expYrs} suffix="+" />
+                    </span>
+                    <span className="hero-stat-lbl">Years Exp</span>
+                  </div>
+                )}
+                {allCerts.length > 0 && (
+                  <div className="hero-stat">
+                    <span className="hero-stat-num gradient-text">
+                      <Counter to={allCerts.length} />
+                    </span>
+                    <span className="hero-stat-lbl">Certs</span>
+                  </div>
+                )}
+              </div>
             )}
-          </section>
+          </div>
 
-          {/* ═══════════════════════════════════════════════════
-             CERTIFICATES
-          ═══════════════════════════════════════════════════ */}
-          {allCerts.length > 0 && (
-            <section id="certificates" className="section bg-light-grey">
-              <Reveal className="section-header">
-                <p className="section-eyebrow">CREDENTIALS</p>
-                <h2>
-                  Certificates &amp; <span className="gradient-text">Achievements</span>
-                </h2>
-                <p className="subtitle" style={{ margin: "12px auto 0" }}>
-                  {allCerts.length} credential{allCerts.length !== 1 ? "s" : ""}
-                  {featuredCerts.length > 0 ? ` · ${featuredCerts.length} featured` : ""}
-                </p>
-              </Reveal>
+          {/* Right — 3D profile card */}
+          <div className="hero-visual">
+            <div className="hero-3d-scene">
+              <FloatingOrb size={220} color="#3E18F9" top="-10%" left="-15%" delay={0}   duration={6} />
+              <FloatingOrb size={160} color="#37D7FA" top="55%"  left="65%"  delay={1.5} duration={7} />
+              <FloatingOrb size={100} color="#FF8DF2" top="15%"  left="70%"  delay={0.8} duration={5} />
 
-              {/* Stats bar */}
-              <Reveal delay={0.06} style={{ width: "100%", maxWidth: 1100, marginBottom: 32 }}>
-                <div className="cert-stats">
-                  {(
-                    [
-                      { icon: "🏆", val: allCerts.length,    lbl: "Total" },
-                      { icon: "⭐", val: featuredCerts.length, lbl: "Featured" },
-                      { icon: "✅", val: certValidCount,      lbl: "Valid" },
-                      { icon: "🏢", val: certIssuerCount,     lbl: "Issuers" },
-                    ] as { icon: string; val: number; lbl: string }[]
-                  ).map(({ icon, val, lbl }) => (
-                    <div key={lbl} className="cert-stat">
-                      <span className="cert-stat__icon">{icon}</span>
-                      <span className="cert-stat__val gradient-text">{val}</span>
-                      <span className="cert-stat__lbl">{lbl}</span>
-                    </div>
-                  ))}
+              <TiltCard className="profile-3d-card">
+                <div className="profile-card-glow" aria-hidden="true" />
+                {photoUrl ? (
+                  <img src={photoUrl} alt={name} className="profile-card-photo" />
+                ) : (
+                  <div className="profile-card-placeholder" aria-hidden="true">
+                    <span>{firstName.charAt(0)}</span>
+                  </div>
+                )}
+                <div className="profile-card-info">
+                  <p className="profile-card-name">{name}</p>
+                  <p className="profile-card-title">{title}</p>
+                  {profile?.location && (
+                    <p className="profile-card-loc">📍 {profile.location}</p>
+                  )}
                 </div>
-              </Reveal>
+                <div className="float-badge float-badge-1">⚡ {allSkills.length} Skills</div>
+                <div className="float-badge float-badge-2">🚀 {allProjects.length} Projects</div>
+                {allCerts.length > 0 && (
+                  <div className="float-badge float-badge-3">🎓 {allCerts.length} Certs</div>
+                )}
+              </TiltCard>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              {/* Cards grid */}
-              <div className="certs-grid" style={{ maxWidth: 1100, width: "100%" }}>
-                {displayedCerts.map((c, i) => {
-                  const expired = certIsExpired(c.expiry_date);
-                  return (
-                    <Reveal key={c.certificate_id} delay={i * 0.07}>
-                      <TiltCard className={`cert-card${expired ? " cert-card--expired" : ""}`}>
-                        {/* Top gradient bar */}
+      {/* ═══════════════════════════════════════════════════
+         ABOUT
+      ═══════════════════════════════════════════════════ */}
+      <section id="about" className="section">
+        <Reveal className="section-header">
+          <p className="section-eyebrow">WHO I AM</p>
+          <h2>About <span className="gradient-text">Me</span></h2>
+        </Reveal>
+
+        <div className="about-grid">
+          <Reveal delay={0.1} className="about-left">
+            {photoUrl && (
+              <TiltCard className="about-photo-wrap">
+                <img src={photoUrl} alt={name} className="about-photo" />
+                {expYrs > 0 && (
+                  <div className="about-photo-badge">
+                    <span className="about-photo-num">{expYrs}+</span>
+                    <span>Years Exp</span>
+                  </div>
+                )}
+              </TiltCard>
+            )}
+          </Reveal>
+
+          <Reveal delay={0.2} className="about-right">
+            {profile?.objective && (
+              <p className="about-objective">{profile.objective}</p>
+            )}
+            {profile?.bio && profile.bio !== profile.objective && (
+              <p className="about-bio">{profile.bio}</p>
+            )}
+            <div className="about-details">
+              {profile?.location && (
+                <div className="about-detail-item">
+                  <span className="about-detail-icon">📍</span>
+                  <div>
+                    <span className="about-detail-lbl">Location</span>
+                    <span className="about-detail-val">{profile.location}</span>
+                  </div>
+                </div>
+              )}
+              {profile?.email && (
+                <div className="about-detail-item">
+                  <span className="about-detail-icon">✉️</span>
+                  <div>
+                    <span className="about-detail-lbl">Email</span>
+                    <a href={`mailto:${profile.email}`} className="about-detail-val about-detail-link">
+                      {profile.email}
+                    </a>
+                  </div>
+                </div>
+              )}
+              {profile?.phone && (
+                <div className="about-detail-item">
+                  <span className="about-detail-icon">📞</span>
+                  <div>
+                    <span className="about-detail-lbl">Phone</span>
+                    <span className="about-detail-val">{profile.phone}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+            {profile?.skills_summary && (
+              <p className="about-skills-summary">{profile.skills_summary}</p>
+            )}
+            <div className="about-socials">
+              {github   && <a href={github}   target="_blank" rel="noreferrer" className="social-pill">GitHub</a>}
+              {linkedin && <a href={linkedin} target="_blank" rel="noreferrer" className="social-pill">LinkedIn</a>}
+              {profile?.social_links?.twitter   && (
+                <a href={profile.social_links.twitter}   target="_blank" rel="noreferrer" className="social-pill">Twitter</a>
+              )}
+              {profile?.social_links?.instagram && (
+                <a href={profile.social_links.instagram} target="_blank" rel="noreferrer" className="social-pill">Instagram</a>
+              )}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+         SKILLS
+      ═══════════════════════════════════════════════════ */}
+      <section id="skills" className="section bg-light-grey">
+        <Reveal className="section-header">
+          <p className="section-eyebrow">EXPERTISE</p>
+          <h2>Tech <span className="gradient-text">Stack</span></h2>
+          <p className="subtitle" style={{ margin: "12px auto 0" }}>
+            {activeSkills.length} skills across {Object.keys(skillsByCategory).length} categories
+          </p>
+        </Reveal>
+
+        {Object.keys(skillsByCategory).length > 0 ? (
+          Object.entries(skillsByCategory).map(([cat, skills], catIdx) => (
+            <Reveal key={cat} delay={catIdx * 0.08} style={{ width: "100%", maxWidth: 1100 }}>
+              <div className="skill-category-block">
+                <h3 className="skill-cat-title">{cat}</h3>
+                <div className="skills-grid">
+                  {skills.map((s) => {
+                    const accent = s.color ?? PROF_COLOR[s.proficiency_level ?? ""] ?? "#3E18F9";
+                    return (
+                      <TiltCard key={s.skill_id} className="skill-badge-3d">
                         <div
-                          className={`cert-topbar${c.is_featured ? " cert-topbar--gold" : ""}`}
-                        />
-
-                        {/* Thumbnail */}
-                        <div className="cert-thumb">
-                          {c.thumbnail_url ? (
-                            <img
-                              src={c.thumbnail_url}
-                              alt={c.name}
-                              className="cert-thumb__img"
-                            />
+                          className="skill-badge-inner"
+                          style={{ borderColor: `${accent}33` }}
+                        >
+                          {s.icon_url ? (
+                            <img src={s.icon_url} alt={s.name} className="skill-icon-img" />
                           ) : (
-                            <div
-                              className="cert-thumb__placeholder"
-                              aria-hidden="true"
-                            >
-                              🎓
-                            </div>
+                            <span className="skill-icon-letter" style={{ color: accent }}>
+                              {s.name.charAt(0)}
+                            </span>
                           )}
-                          {c.is_featured && (
-                            <span className="cert-badge cert-badge--feat">⭐ Featured</span>
-                          )}
-                          {c.expiry_date && expired && (
-                            <span className="cert-badge cert-badge--exp">Expired</span>
-                          )}
-                          {c.expiry_date && !expired && (
-                            <span className="cert-badge cert-badge--valid">✓ Valid</span>
-                          )}
-                        </div>
-
-                        {/* Body */}
-                        <div className="cert-body">
-                          <h3 className="cert-name">{c.name}</h3>
-                          {c.organization && (
-                            <p className="cert-org">{c.organization}</p>
-                          )}
-                          {c.description && (
-                            <p className="cert-desc">{c.description}</p>
-                          )}
-
-                          {/* Dates */}
-                          <div className="cert-dates">
-                            {c.issue_date && (
-                              <div className="cert-date-row">
-                                <span className="cert-date-lbl">Issued</span>
-                                <span className="cert-date-val">
-                                  {fmtDate(c.issue_date)}
-                                </span>
-                              </div>
-                            )}
-                            {c.expiry_date && (
+                          <span className="skill-badge-name">{s.name}</span>
+                          {s.rating != null && (
+                            <div className="skill-badge-bar-wrap">
                               <div
-                                className={`cert-date-row${expired ? " cert-date-row--exp" : ""}`}
-                              >
-                                <span className="cert-date-lbl">
-                                  {expired ? "Expired" : "Valid until"}
-                                </span>
-                                <span className="cert-date-val">
-                                  {fmtDate(c.expiry_date)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Credential ID */}
-                          {c.credential_id && (
-                            <div className="cert-cred-id">
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                                <line x1="4" y1="9"  x2="20" y2="9"  />
-                                <line x1="4" y1="15" x2="20" y2="15" />
-                                <line x1="10" y1="3" x2="8"  y2="21" />
-                                <line x1="16" y1="3" x2="14" y2="21" />
-                              </svg>
-                              <span>{c.credential_id}</span>
+                                className="skill-badge-bar"
+                                style={{
+                                  width: `${(s.rating / 10) * 100}%`,
+                                  background: accent,
+                                }}
+                              />
                             </div>
-                          )}
-                        </div>
-
-                        {/* Footer links */}
-                        <div className="cert-footer">
-                          {c.credential_url && (
-                            <a
-                              href={c.credential_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="cert-btn cert-btn--verify"
-                            >
-                              Verify ↗
-                            </a>
-                          )}
-                          {c.certificate_url && (
-                            <a
-                              href={c.certificate_url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="cert-btn cert-btn--view"
-                            >
-                              Certificate ↗
-                            </a>
                           )}
                         </div>
                       </TiltCard>
-                    </Reveal>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-
-              {allCerts.length > 6 && (
-                <Reveal delay={0.2} style={{ marginTop: 36 }}>
-                  <a href="#contact" className="outline-btn">
-                    View All {allCerts.length} Certificates →
-                  </a>
-                </Reveal>
-              )}
-            </section>
-          )}
-
-          {/* ═══════════════════════════════════════════════════
-             CONTACT
-          ═══════════════════════════════════════════════════ */}
-          <section id="contact" className="section">
-            <Reveal className="section-header">
-              <p className="section-eyebrow">GET IN TOUCH</p>
-              <h2>Let's <span className="gradient-text">Work Together</span></h2>
-              <p className="subtitle" style={{ margin: "12px auto 0" }}>
-                Have a project in mind? I'd love to hear about it.
-              </p>
             </Reveal>
+          ))
+        ) : (
+          <div className="skills-grid" style={{ maxWidth: 1000 }}>
+            {activeSkills.map((s, i) => (
+              <Reveal key={s.skill_id} delay={i * 0.04}>
+                <div className="skill-badge">{s.name}</div>
+              </Reveal>
+            ))}
+          </div>
+        )}
+      </section>
 
-            <Reveal delay={0.15}>
-              <TiltCard className="contact-card">
-                <div className="contact-card-inner">
-                  <div className="contact-left">
-                    <h3>Ready to start something great?</h3>
-                    <p>I'm currently available for freelance work and full-time opportunities.</p>
-                    <div className="contact-links">
-                      {profile?.email && (
-                        <a href={`mailto:${profile.email}`} className="contact-link">
-                          <span className="contact-link-icon">✉️</span>
-                          {profile.email}
+      {/* ═══════════════════════════════════════════════════
+         PROJECTS - Right to Left Rotating Marquee
+      ═══════════════════════════════════════════════════ */}
+      <section id="portfolio" className="section">
+        <Reveal className="section-header">
+          <p className="section-eyebrow">WORK</p>
+          <h2>Featured <span className="gradient-text">Projects</span></h2>
+          <p className="subtitle" style={{ margin: "12px auto 0" }}>
+            {featuredProjects.length > 0
+              ? `${featuredProjects.length} featured out of ${allProjects.length} total`
+              : `${allProjects.length} projects`}
+          </p>
+        </Reveal>
+
+        <div className="marquee-viewport">
+          <div className="marquee-track">
+            
+            {/* We map twice back-to-back to create an infinite seamless loop */}
+            {[...displayProjects, ...displayProjects].map((p, i) => (
+              <div key={`marquee-${p.project_id}-${i}`} className="marquee-item pop-in" style={{ animationDelay: `${(i % displayProjects.length) * 0.15}s` }}>
+                <TiltCard className="project-card-3d" style={{ height: "100%" }}>
+                  {p.thumbnail_url ? (
+                    <div className="proj-thumb">
+                      <img src={p.thumbnail_url} alt={p.title} />
+                    </div>
+                  ) : (
+                    <div className="proj-thumb proj-thumb-placeholder">
+                      <span>💻</span>
+                    </div>
+                  )}
+
+                  <div className="proj-body">
+                    {p.complexity_score != null && (
+                      <span className={`proj-complexity ${cxClass(p.complexity_score)}`}>
+                        {cxLabel(p.complexity_score)}
+                      </span>
+                    )}
+
+                    <h3 className="proj-title">{p.title}</h3>
+                    {p.description && (
+                      <p className="proj-desc">{p.description}</p>
+                    )}
+
+                    {p.tech_stack && (
+                      <div className="proj-tech-row">
+                        {[
+                          ...(p.tech_stack.programming_languages ?? []),
+                          ...(p.tech_stack.frameworks ?? []),
+                        ]
+                          .slice(0, 5)
+                          .map((t) => (
+                            <span key={t} className="proj-tech-chip">{t}</span>
+                          ))}
+                      </div>
+                    )}
+
+                    {p.tags && p.tags.length > 0 && (
+                      <div className="proj-tags">
+                        {p.tags.slice(0, 4).map((t) => (
+                          <span key={t} className="proj-tag">{t}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="proj-links">
+                      {p.github_link && (
+                        <a
+                          href={p.github_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="proj-link proj-link-gh"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                          </svg>
+                          Code
                         </a>
                       )}
-                      {profile?.phone && (
-                        <a href={`tel:${profile.phone}`} className="contact-link">
-                          <span className="contact-link-icon">📞</span>
-                          {profile.phone}
+                      {p.live_demo_url && (
+                        <a
+                          href={p.live_demo_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="proj-link proj-link-live"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            <polyline points="15 3 21 3 21 9"/>
+                            <line x1="10" y1="14" x2="21" y2="3"/>
+                          </svg>
+                          Live Demo
                         </a>
-                      )}
-                      {profile?.location && (
-                        <div className="contact-link">
-                          <span className="contact-link-icon">📍</span>
-                          {profile.location}
-                        </div>
                       )}
                     </div>
                   </div>
+                </TiltCard>
+              </div>
+            ))}
+          </div>
+        </div>
 
-                  <div className="contact-right">
-                    {github && (
-                      <a href={github} target="_blank" rel="noreferrer" className="contact-social-btn">
-                        <GhIcon /> GitHub
-                      </a>
-                    )}
-                    {linkedin && (
-                      <a href={linkedin} target="_blank" rel="noreferrer" className="contact-social-btn">
-                        <LiIcon /> LinkedIn
-                      </a>
-                    )}
-                    {profile?.social_links?.instagram && (
-                      <a
-                        href={profile.social_links.instagram}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="contact-social-btn contact-social-ig"
-                      >
-                        <IgIcon /> CHHAVA.AI
-                      </a>
-                    )}
-                    <a href="#home" className="primary-btn" style={{ marginTop: 8 }}>
-                      Let's Talk 🚀
-                    </a>
-                  </div>
+        {allProjects.length > 6 && (
+          <Reveal delay={0.2} style={{ marginTop: 20 }}>
+            <a href="#contact" className="outline-btn">
+              View All {allProjects.length} Projects →
+            </a>
+          </Reveal>
+        )}
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+         CERTIFICATES
+      ═══════════════════════════════════════════════════ */}
+      {allCerts.length > 0 && (
+        <section id="certificates" className="section bg-light-grey">
+          <Reveal className="section-header">
+            <p className="section-eyebrow">CREDENTIALS</p>
+            <h2>
+              Certificates &amp; <span className="gradient-text">Achievements</span>
+            </h2>
+            <p className="subtitle" style={{ margin: "12px auto 0" }}>
+              {allCerts.length} credential{allCerts.length !== 1 ? "s" : ""}
+              {featuredCerts.length > 0 ? ` · ${featuredCerts.length} featured` : ""}
+            </p>
+          </Reveal>
+
+          {/* Stats bar */}
+          <Reveal delay={0.06} style={{ width: "100%", maxWidth: 1100, marginBottom: 32 }}>
+            <div className="cert-stats">
+              {(
+                [
+                  { icon: "🏆", val: allCerts.length,    lbl: "Total" },
+                  { icon: "⭐", val: featuredCerts.length, lbl: "Featured" },
+                  { icon: "✅", val: certValidCount,      lbl: "Valid" },
+                  { icon: "🏢", val: certIssuerCount,     lbl: "Issuers" },
+                ] as { icon: string; val: number; lbl: string }[]
+              ).map(({ icon, val, lbl }) => (
+                <div key={lbl} className="cert-stat">
+                  <span className="cert-stat__icon">{icon}</span>
+                  <span className="cert-stat__val gradient-text">{val}</span>
+                  <span className="cert-stat__lbl">{lbl}</span>
                 </div>
-              </TiltCard>
+              ))}
+            </div>
+          </Reveal>
+
+          {/* Cards grid */}
+          <div className="certs-grid" style={{ maxWidth: 1100, width: "100%" }}>
+            {displayedCerts.map((c, i) => {
+              const expired = certIsExpired(c.expiry_date);
+              return (
+                <Reveal key={c.certificate_id} delay={i * 0.07}>
+                  <TiltCard className={`cert-card${expired ? " cert-card--expired" : ""}`}>
+                    {/* Top gradient bar */}
+                    <div
+                      className={`cert-topbar${c.is_featured ? " cert-topbar--gold" : ""}`}
+                    />
+
+                    {/* Thumbnail */}
+                    <div className="cert-thumb">
+                      {c.thumbnail_url ? (
+                        <img
+                          src={c.thumbnail_url}
+                          alt={c.name}
+                          className="cert-thumb__img"
+                        />
+                      ) : (
+                        <div
+                          className="cert-thumb__placeholder"
+                          aria-hidden="true"
+                        >
+                          🎓
+                        </div>
+                      )}
+                      {c.is_featured && (
+                        <span className="cert-badge cert-badge--feat">⭐ Featured</span>
+                      )}
+                      {c.expiry_date && expired && (
+                        <span className="cert-badge cert-badge--exp">Expired</span>
+                      )}
+                      {c.expiry_date && !expired && (
+                        <span className="cert-badge cert-badge--valid">✓ Valid</span>
+                      )}
+                    </div>
+
+                    {/* Body */}
+                    <div className="cert-body">
+                      <h3 className="cert-name">{c.name}</h3>
+                      {c.organization && (
+                        <p className="cert-org">{c.organization}</p>
+                      )}
+                      {c.description && (
+                        <p className="cert-desc">{c.description}</p>
+                      )}
+
+                      {/* Dates */}
+                      <div className="cert-dates">
+                        {c.issue_date && (
+                          <div className="cert-date-row">
+                            <span className="cert-date-lbl">Issued</span>
+                            <span className="cert-date-val">
+                              {fmtDate(c.issue_date)}
+                            </span>
+                          </div>
+                        )}
+                        {c.expiry_date && (
+                          <div
+                            className={`cert-date-row${expired ? " cert-date-row--exp" : ""}`}
+                          >
+                            <span className="cert-date-lbl">
+                              {expired ? "Expired" : "Valid until"}
+                            </span>
+                            <span className="cert-date-val">
+                              {fmtDate(c.expiry_date)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Credential ID */}
+                      {c.credential_id && (
+                        <div className="cert-cred-id">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                            <line x1="4" y1="9"  x2="20" y2="9"  />
+                            <line x1="4" y1="15" x2="20" y2="15" />
+                            <line x1="10" y1="3" x2="8"  y2="21" />
+                            <line x1="16" y1="3" x2="14" y2="21" />
+                          </svg>
+                          <span>{c.credential_id}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer links */}
+                    <div className="cert-footer">
+                      {c.credential_url && (
+                        <a
+                          href={c.credential_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="cert-btn cert-btn--verify"
+                        >
+                          Verify ↗
+                        </a>
+                      )}
+                      {c.certificate_url && (
+                        <a
+                          href={c.certificate_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="cert-btn cert-btn--view"
+                        >
+                          Certificate ↗
+                        </a>
+                      )}
+                    </div>
+                  </TiltCard>
+                </Reveal>
+              );
+            })}
+          </div>
+
+          {allCerts.length > 6 && (
+            <Reveal delay={0.2} style={{ marginTop: 36 }}>
+              <a href="#contact" className="outline-btn">
+                View All {allCerts.length} Certificates →
+              </a>
             </Reveal>
-          </section>
-        </>
+          )}
+        </section>
       )}
+
+      {/* ═══════════════════════════════════════════════════
+         CONTACT
+      ═══════════════════════════════════════════════════ */}
+      <section id="contact" className="section">
+        <Reveal className="section-header">
+          <p className="section-eyebrow">GET IN TOUCH</p>
+          <h2>Let's <span className="gradient-text">Work Together</span></h2>
+          <p className="subtitle" style={{ margin: "12px auto 0" }}>
+            Have a project in mind? I'd love to hear about it.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.15}>
+          <TiltCard className="contact-card">
+            <div className="contact-card-inner">
+              <div className="contact-left">
+                <h3>Ready to start something great?</h3>
+                <p>I'm currently available for freelance work and full-time opportunities.</p>
+                <div className="contact-links">
+                  {profile?.email && (
+                    <a href={`mailto:${profile.email}`} className="contact-link">
+                      <span className="contact-link-icon">✉️</span>
+                      {profile.email}
+                    </a>
+                  )}
+                  {profile?.phone && (
+                    <a href={`tel:${profile.phone}`} className="contact-link">
+                      <span className="contact-link-icon">📞</span>
+                      {profile.phone}
+                    </a>
+                  )}
+                  {profile?.location && (
+                    <div className="contact-link">
+                      <span className="contact-link-icon">📍</span>
+                      {profile.location}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="contact-right">
+                {github && (
+                  <a href={github} target="_blank" rel="noreferrer" className="contact-social-btn">
+                    <GhIcon /> GitHub
+                  </a>
+                )}
+                {linkedin && (
+                  <a href={linkedin} target="_blank" rel="noreferrer" className="contact-social-btn">
+                    <LiIcon /> LinkedIn
+                  </a>
+                )}
+                {profile?.social_links?.instagram && (
+                  <a
+                    href={profile.social_links.instagram}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="contact-social-btn contact-social-ig"
+                  >
+                    <IgIcon /> CHHAVA.AI
+                  </a>
+                )}
+                <a href="#home" className="primary-btn" style={{ marginTop: 8 }}>
+                  Let's Talk 🚀
+                </a>
+              </div>
+            </div>
+          </TiltCard>
+        </Reveal>
+      </section>
 
       {/* ═══════════ MOBILE BOTTOM NAV ═══════════ */}
       <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
@@ -1018,7 +960,6 @@ const Home: React.FC = () => {
             key={href}
             href={href}
             className={`mobile-nav-item${activeSection === href.slice(1) ? " mobile-nav-active" : ""}`}
-            onClick={() => setViewMode("public")}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d={path} />
@@ -1026,22 +967,19 @@ const Home: React.FC = () => {
             <span>{label}</span>
           </a>
         ))}
-        {/* Toggle to Admin mode from Mobile */}
-        <button 
-          onClick={() => setViewMode(v => v === "public" ? "admin" : "public")} 
-          className="mobile-nav-item admin-mobile"
-          style={{ background: 'transparent', border: 'none' }}
-        >
+        
+        {/* Mobile Admin Link restored */}
+        <Link to="/admin/login" className="mobile-nav-item admin-mobile">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
           <span>Admin</span>
-        </button>
+        </Link>
       </nav>
 
       {/* ═══════════════════════════════════════════════════
-         GLOBAL STYLES (Appended Marquee & Admin glass styling)
+         GLOBAL STYLES
       ═══════════════════════════════════════════════════ */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;800&family=Inter:wght@400;500;600;800;900&display=swap');
@@ -1358,32 +1296,6 @@ const Home: React.FC = () => {
         .contact-social-btn:hover { border-color:var(--li-purple); color:var(--li-purple); background:rgba(62,24,249,.04); transform:translateX(4px); }
         .contact-social-ig:hover { color:#c026d3; border-color:#c026d3; background:rgba(192,38,211,.04); }
 
-        /* ── Admin Integrated UI Styles ── */
-        .admin-nav-pill {
-          display: flex; gap: 8px; justify-content: center;
-          background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px);
-          padding: 8px; border-radius: 999px; margin-bottom: 30px;
-          border: 1px solid var(--li-border);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.05);
-          overflow-x: auto; max-width: max-content; margin: 0 auto 30px;
-        }
-        .admin-tab-btn {
-          padding: 10px 24px; border: none; background: transparent;
-          border-radius: 999px; font-weight: 700; font-family: 'Inter', sans-serif;
-          cursor: pointer; color: var(--li-text-muted); transition: all 0.2s;
-        }
-        .admin-tab-btn:hover { color: var(--li-purple); }
-        .admin-tab-btn.active {
-          background: white; color: var(--li-purple);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .admin-glass-card {
-          background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px);
-          border: 1px solid var(--li-border); border-radius: 24px;
-          padding: 30px; box-shadow: 0 24px 80px rgba(62, 24, 249, 0.08);
-          min-height: 600px;
-        }
-
         /* Mobile nav */
         .mobile-bottom-nav { display:none; }
 
@@ -1420,7 +1332,6 @@ const Home: React.FC = () => {
           .contact-card-inner { padding:28px 24px; }
           .float-badge { display:none; }
           .marquee-item { width: 300px; } /* Slightly scale down on mobile */
-          .admin-glass-card { padding: 15px; border-radius: 16px; }
         }
         @media (max-width:600px) {
           .cert-stats { grid-template-columns:repeat(2,1fr); gap:10px; }
