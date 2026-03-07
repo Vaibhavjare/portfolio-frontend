@@ -111,7 +111,8 @@ const RatingBar = ({ value, color }: { value: number; color: string }) => {
    MAIN COMPONENT
 ───────────────────────────────────────── */
 const SkillsManager = () => {
-  const { data: skills = [], isLoading, refetch } = useGetSkillsQuery({});
+  // SETTING LIMIT TO 60
+  const { data: skills = [], isLoading, refetch } = useGetSkillsQuery({ limit: 100 });
   const [createSkill, { isLoading: isCreating }] = useCreateSkillMutation();
   const [updateSkill, { isLoading: isUpdating }] = useUpdateSkillMutation();
   const [deleteSkill] = useDeleteSkillMutation();
