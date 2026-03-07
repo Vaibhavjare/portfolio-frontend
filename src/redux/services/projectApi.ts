@@ -10,16 +10,25 @@ const TOKEN_KEY =
 
 /* ---------------- Types ---------------- */
 
+export interface TechStack {
+  programming_languages?: string[];
+  frameworks?: string[];
+  databases?: string[];
+  tools?: string[];
+}
+
 export interface Project {
   project_id: string;
   title: string;
   description?: string;
-  tech_stack?: string[];
-  github_url?: string;
-  live_url?: string;
-  image_url?: string;
+  tech_stack?: TechStack;
+  github_link?: string;
+  video_links?: string[];
+  thumbnail_url?: string;
+  live_demo_url?: string;
   featured?: boolean;
   complexity_score?: number;
+  tags?: string[];
   created_at?: string;
   updated_at?: string;
 }
@@ -27,23 +36,27 @@ export interface Project {
 export interface ProjectCreateRequest {
   title: string;
   description?: string;
-  tech_stack?: string[];
-  github_url?: string;
-  live_url?: string;
-  image_url?: string;
+  tech_stack?: TechStack;
+  github_link?: string;
+  video_links?: string[];
+  thumbnail_url?: string;
+  live_demo_url?: string;
   featured?: boolean;
   complexity_score?: number;
+  tags?: string[];
 }
 
 export interface ProjectUpdateRequest {
   title?: string;
   description?: string;
-  tech_stack?: string[];
-  github_url?: string;
-  live_url?: string;
-  image_url?: string;
+  tech_stack?: TechStack;
+  github_link?: string;
+  video_links?: string[];
+  thumbnail_url?: string;
+  live_demo_url?: string;
   featured?: boolean;
   complexity_score?: number;
+  tags?: string[];
 }
 
 export interface ProjectCountResponse {
@@ -54,14 +67,11 @@ export interface ProjectCountResponse {
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
-
   prepareHeaders: (headers) => {
     const token = localStorage.getItem(TOKEN_KEY);
-
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
-
     return headers;
   },
 });
@@ -75,7 +85,6 @@ export const projectApi = createApi({
 
   endpoints: (builder) => ({
     /* -------- GET PROJECTS -------- */
-
     getProjects: builder.query<
       Project[],
       {
@@ -98,7 +107,6 @@ export const projectApi = createApi({
     }),
 
     /* -------- GET PROJECT COUNT -------- */
-
     getProjectCount: builder.query<ProjectCountResponse, { search?: string }>({
       query: (params) => ({
         url: "/projects/count",
@@ -108,7 +116,6 @@ export const projectApi = createApi({
     }),
 
     /* -------- GET SINGLE PROJECT -------- */
-
     getProjectById: builder.query<Project, string>({
       query: (projectId) => ({
         url: `/projects/${projectId}`,
@@ -117,7 +124,6 @@ export const projectApi = createApi({
     }),
 
     /* -------- CREATE PROJECT -------- */
-
     createProject: builder.mutation<Project, ProjectCreateRequest>({
       query: (body) => ({
         url: "/projects",
@@ -128,7 +134,6 @@ export const projectApi = createApi({
     }),
 
     /* -------- UPDATE PROJECT -------- */
-
     updateProject: builder.mutation<
       Project,
       { projectId: string; body: ProjectUpdateRequest }
@@ -142,7 +147,6 @@ export const projectApi = createApi({
     }),
 
     /* -------- DELETE PROJECT -------- */
-
     deleteProject: builder.mutation<{ message: string }, string>({
       query: (projectId) => ({
         url: `/projects/${projectId}`,
@@ -154,7 +158,6 @@ export const projectApi = createApi({
 });
 
 /* ---------------- Hooks ---------------- */
-
 export const {
   useGetProjectsQuery,
   useGetProjectCountQuery,
