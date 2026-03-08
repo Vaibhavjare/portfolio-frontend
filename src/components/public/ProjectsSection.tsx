@@ -97,6 +97,7 @@ const ProjectsSection = () => {
     <section className="section" id="portfolio">
 
       <Reveal className="section-header">
+        <p className="section-eyebrow">WORK</p>
         <h2>Featured <span className="gradient-text">Projects</span></h2>
         <p className="subtitle" style={{ margin: "12px auto 0" }}>
           {allProjects.length > 0
@@ -120,111 +121,118 @@ const ProjectsSection = () => {
         </Reveal>
       )}
 
-      {/* Grid */}
+      {/* Marquee Grid */}
       {displayed.length > 0 ? (
-        <div className="project-grid" style={{ maxWidth: 1100, width: "100%" }}>
-          {displayed.slice(0, 9).map((p, i) => {
-            const level = cx(p.complexity_score);
-            const allTech = [
-              ...(p.tech_stack?.programming_languages || []),
-              ...(p.tech_stack?.frameworks || []),
-              ...(p.tech_stack?.databases || []),
-              ...(p.tech_stack?.tools || []),
-            ];
-            return (
-              <Reveal key={p.project_id} delay={i * 0.07}>
-                <ProjectCard featured={!!p.featured}>
+        <div className="marquee-viewport">
+          <div className="marquee-track">
+            {/* Array is doubled to create the seamless infinite scroll effect */}
+            {[...displayed.slice(0, 8), ...displayed.slice(0, 8)].map((p, i) => {
+              const level = cx(p.complexity_score);
+              const allTech = [
+                ...(p.tech_stack?.programming_languages || []),
+                ...(p.tech_stack?.frameworks || []),
+                ...(p.tech_stack?.databases || []),
+                ...(p.tech_stack?.tools || []),
+              ];
+              return (
+                <div 
+                  key={`marquee-${p.project_id}-${i}`} 
+                  className="marquee-item pop-in" 
+                  style={{ animationDelay: `${(i % displayed.length) * 0.15}s` }}
+                >
+                  <ProjectCard featured={!!p.featured}>
 
-                  {/* Aurora overlay — reacts to mouse */}
-                  <div className="ps-aurora" />
+                    {/* Aurora overlay — reacts to mouse */}
+                    <div className="ps-aurora" />
 
-                  {/* Top gradient bar */}
-                  <div className="ps-top-bar" />
+                    {/* Top gradient bar */}
+                    <div className="ps-top-bar" />
 
-                  {/* Thumbnail */}
-                  {p.thumbnail_url ? (
-                    <div className="ps-thumb">
-                      <img src={p.thumbnail_url} alt={p.title} />
-                      <div className="ps-thumb-overlay" />
-                    </div>
-                  ) : (
-                    <div className="ps-thumb ps-thumb-placeholder">
-                      <span className="project-icon">
-                        {(p.tags?.[0] || p.title)?.[0] === "A" ? "🤖"
-                          : (p.tags?.[0] || p.title)?.[0] === "3" ? "🧠"
-                          : "💻"}
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="ps-body">
-                    {/* Complexity + featured */}
-                    <div className="ps-meta-row">
-                      {level && (
-                        <span className={`ps-cx ${CX_CLASS[level]}`}>{CX_LABELS[level]}</span>
-                      )}
-                      {p.featured && (
-                        <span className="ps-feat-badge">⭐ Featured</span>
-                      )}
-                    </div>
-
-                    <h3 style={{ margin: 0 }}>{p.title}</h3>
-
-                    {p.description && (
-                      <p className="ps-desc">{p.description}</p>
+                    {/* Thumbnail */}
+                    {p.thumbnail_url ? (
+                      <div className="ps-thumb">
+                        <img src={p.thumbnail_url} alt={p.title} />
+                        <div className="ps-thumb-overlay" />
+                      </div>
+                    ) : (
+                      <div className="ps-thumb ps-thumb-placeholder">
+                        <span className="project-icon">
+                          {(p.tags?.[0] || p.title)?.[0] === "A" ? "🤖"
+                            : (p.tags?.[0] || p.title)?.[0] === "3" ? "🧠"
+                            : "💻"}
+                        </span>
+                      </div>
                     )}
 
-                    {/* Tech stack chips */}
-                    {allTech.length > 0 && (
-                      <div className="ps-tech-row">
-                        {allTech.slice(0, 5).map(t => (
-                          <span key={t} className="ps-tech-chip">{t}</span>
-                        ))}
-                        {allTech.length > 5 && (
-                          <span className="ps-tech-chip ps-chip-more">+{allTech.length - 5}</span>
+                    <div className="ps-body">
+                      {/* Complexity + featured */}
+                      <div className="ps-meta-row">
+                        {level && (
+                          <span className={`ps-cx ${CX_CLASS[level]}`}>{CX_LABELS[level]}</span>
+                        )}
+                        {p.featured && (
+                          <span className="ps-feat-badge">⭐ Featured</span>
                         )}
                       </div>
-                    )}
 
-                    {/* Tags */}
-                    {p.tags && p.tags.length > 0 && (
-                      <div className="ps-tags">
-                        {p.tags.slice(0, 4).map(t => (
-                          <span key={t} className="ps-tag">#{t}</span>
-                        ))}
+                      <h3 style={{ margin: 0 }}>{p.title}</h3>
+
+                      {p.description && (
+                        <p className="ps-desc">{p.description}</p>
+                      )}
+
+                      {/* Tech stack chips */}
+                      {allTech.length > 0 && (
+                        <div className="ps-tech-row">
+                          {allTech.slice(0, 5).map(t => (
+                            <span key={t} className="ps-tech-chip">{t}</span>
+                          ))}
+                          {allTech.length > 5 && (
+                            <span className="ps-tech-chip ps-chip-more">+{allTech.length - 5}</span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Tags */}
+                      {p.tags && p.tags.length > 0 && (
+                        <div className="ps-tags">
+                          {p.tags.slice(0, 4).map(t => (
+                            <span key={t} className="ps-tag">#{t}</span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Links */}
+                      <div className="ps-links">
+                        {p.github_link && (
+                          <a href={p.github_link} target="_blank" rel="noreferrer" className="ps-link ps-link-gh">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                            </svg>
+                            Code
+                          </a>
+                        )}
+                        {p.live_demo_url && (
+                          <a href={p.live_demo_url} target="_blank" rel="noreferrer" className="ps-link ps-link-live">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                              <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                            </svg>
+                            Live Demo
+                          </a>
+                        )}
+                        {p.video_links && p.video_links[0] && (
+                          <a href={p.video_links[0]} target="_blank" rel="noreferrer" className="ps-link ps-link-vid">
+                            ▶ Video
+                          </a>
+                        )}
                       </div>
-                    )}
-
-                    {/* Links */}
-                    <div className="ps-links">
-                      {p.github_link && (
-                        <a href={p.github_link} target="_blank" rel="noreferrer" className="ps-link ps-link-gh">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
-                          </svg>
-                          Code
-                        </a>
-                      )}
-                      {p.live_demo_url && (
-                        <a href={p.live_demo_url} target="_blank" rel="noreferrer" className="ps-link ps-link-live">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                            <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                          </svg>
-                          Live Demo
-                        </a>
-                      )}
-                      {p.video_links && p.video_links[0] && (
-                        <a href={p.video_links[0]} target="_blank" rel="noreferrer" className="ps-link ps-link-vid">
-                          ▶ Video
-                        </a>
-                      )}
                     </div>
-                  </div>
-                </ProjectCard>
-              </Reveal>
-            );
-          })}
+                  </ProjectCard>
+                </div>
+              );
+            })}
+          </div>
         </div>
       ) : (
         /* Placeholder cards — original design */
@@ -243,10 +251,24 @@ const ProjectsSection = () => {
         </div>
       )}
 
+      {/* Button to view all if there are more than 6 projects */}
+      {allProjects.length > 6 && (
+         <Reveal delay={0.2} style={{ marginTop: 24 }}>
+           <a href="#contact" className="outline-btn">
+             View All {allProjects.length} Projects →
+           </a>
+         </Reveal>
+      )}
+
       <style>{`
         @keyframes ps-dot   { 0%,80%,100%{transform:scale(0);opacity:.3} 40%{transform:scale(1);opacity:1} }
         @keyframes ps-bar   { 0%,100%{opacity:.7} 50%{opacity:1} }
         @keyframes ps-shine { from{opacity:.7} to{opacity:1} }
+        
+        /* Section Eyebrow styling if needed */
+        .section-eyebrow { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:800; color:var(--li-purple); letter-spacing:.12em; text-transform:uppercase; margin:0 0 12px; }
+        .outline-btn { padding:12px 24px; border-radius:6px; font-weight:700; font-size:14px; cursor:pointer; transition:all .22s ease; text-decoration:none; display:inline-flex; align-items:center; background:white; color:var(--li-text-main); border:1.5px solid var(--li-border); }
+        .outline-btn:hover { border-color:var(--li-text-main); transform:translateY(-1px); }
 
         /* Loader dots */
         .ps-dot {
@@ -267,10 +289,13 @@ const ProjectsSection = () => {
         .ps-pill-active { background:var(--li-purple); color:white; border-color:var(--li-purple); box-shadow:0 4px 14px rgba(62,24,249,.28); }
         .ps-pill-active:hover { color:white; }
 
-        /* Card */
+        /* Card Setup */
         .ps-card {
           position:relative; overflow:hidden; cursor:default;
           border-radius:14px!important;
+          background:white; border:1px solid var(--li-border);
+          display:flex; flex-direction:column; height: 100%;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.04);
         }
 
         /* Aurora cursor glow */
@@ -304,7 +329,7 @@ const ProjectsSection = () => {
         .ps-thumb img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .45s ease; }
         .ps-card:hover .ps-thumb img { transform:scale(1.05); }
         .ps-thumb-placeholder {
-          display:flex; align-items:center; justify-content:center; height:100%;
+          display:flex; align-items:center; justify-content:center; height:100%; font-size:40px;
         }
         .ps-thumb-overlay {
           position:absolute; inset:0;
@@ -367,6 +392,64 @@ const ProjectsSection = () => {
         .ps-link-live:hover { background:rgba(62,24,249,.12); transform:translateY(-1px); }
         .ps-link-vid  { color:#22c55e; border-color:rgba(34,197,94,.25); background:rgba(34,197,94,.06); }
         .ps-link-vid:hover { background:rgba(34,197,94,.14); transform:translateY(-1px); }
+
+        /* ── PROJECTS MARQUEE ANIMATION CSS ── */
+        .marquee-viewport {
+          overflow: hidden;
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+          position: relative;
+          padding: 24px 0; /* Padding creates room for box-shadow hover */
+          /* Edge fades for a smooth entry/exit */
+          -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        }
+        
+        .marquee-track {
+          display: flex;
+          width: max-content;
+          animation: scrollLeft 35s linear infinite;
+        }
+        
+        /* Pause the marquee on hover */
+        .marquee-track:hover {
+          animation-play-state: paused;
+        }
+        
+        /* The container holding the individual TiltCards */
+        .marquee-item {
+          width: 340px;
+          margin-right: 24px; /* Space between cards */
+          flex-shrink: 0;
+          height: 100%; /* Ensure all items stretch nicely */
+        }
+
+        @keyframes scrollLeft {
+          0% { transform: translateX(0); }
+          /* Scrolls exactly half the total track width to create the seamless loop */
+          100% { transform: translateX(-50%); } 
+        }
+
+        .pop-in {
+          animation: popEffect 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+
+        @keyframes popEffect {
+          0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Fallback Static Grid */
+        .project-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:20px; max-width:1100px; width:100%; }
+
+        /* Responsive Breakpoints for Marquee */
+        @media (max-width: 768px) {
+          .marquee-item { width: 300px; margin-right: 16px; }
+        }
+        @media (max-width: 480px) {
+          .marquee-item { width: 280px; }
+        }
       `}</style>
     </section>
   );

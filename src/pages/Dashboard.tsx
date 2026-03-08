@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { logout } from "../redux/slices/authSlice";
@@ -6,6 +7,7 @@ import type { AppDispatch } from "../redux/store";
 const Dashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -39,29 +41,49 @@ const Dashboard = () => {
         <div className="sidebar-footer">
           <p className="nav-group-title" style={{ margin: "0 4px 8px" }}>MANAGE</p>
 
-          {/* Profile → /admin/dashboard/settings */}
+          {/* Profile */}
           <NavLink to="/admin/dashboard/settings" className="footer-nav-btn">
             <span className="footer-btn-icon">👤</span> <span className="nav-text">Profile</span>
           </NavLink>
 
-          {/* Projects → /admin/dashboard/projects */}
+          {/* Projects */}
           <NavLink to="/admin/dashboard/projects" className="footer-nav-btn footer-nav-btn--projects">
             <span className="footer-btn-icon">🗂️</span> <span className="nav-text">Projects</span>
           </NavLink>
 
-          {/* Skills → /admin/dashboard/skills */}
+          {/* Skills */}
           <NavLink to="/admin/dashboard/skills" className="footer-nav-btn footer-nav-btn--skills">
             <span className="footer-btn-icon">⚡</span> <span className="nav-text">Skills</span>
           </NavLink>
 
-          {/* Certificates → /admin/dashboard/certificates */}
+          {/* Certificates */}
           <NavLink to="/admin/dashboard/certificates" className="footer-nav-btn footer-nav-btn--certs">
             <span className="footer-btn-icon">🎓</span> <span className="nav-text">Certificates</span>
+          </NavLink>
+
+          {/* Testimonials */}
+          <NavLink to="/admin/dashboard/testimonials" className="footer-nav-btn footer-nav-btn--testimonials">
+            <span className="footer-btn-icon">💬</span> <span className="nav-text">Testimonials</span>
+          </NavLink>
+
+          {/* Blogs */}
+          <NavLink to="/admin/dashboard/blog" className="footer-nav-btn footer-nav-btn--blogs">
+            <span className="footer-btn-icon">📝</span> <span className="nav-text">Blogs</span>
+          </NavLink>
+
+          {/* Analytics */}
+          <NavLink to="/admin/dashboard/analytics" className="footer-nav-btn footer-nav-btn--analytics">
+            <span className="footer-btn-icon">📈</span> <span className="nav-text">Analytics</span>
           </NavLink>
 
           {/* Logout */}
           <button className="logout-btn" onClick={handleLogout}>
             <span className="footer-btn-icon">🔐</span> <span className="nav-text">Logout</span>
+          </button>
+
+          {/* Real button for mobile "More" menu instead of CSS ::after */}
+          <button className="mobile-more-trigger" onClick={() => setMoreMenuOpen(true)}>
+            ⋮
           </button>
         </div>
       </aside>
@@ -76,6 +98,60 @@ const Dashboard = () => {
           <Outlet />
         </div>
       </main>
+
+      {/* ================= MOBILE MORE MENU ================= */}
+      {moreMenuOpen && (
+        <div className="mobile-more-overlay" onClick={() => setMoreMenuOpen(false)}>
+          <div className="mobile-more-menu" onClick={(e) => e.stopPropagation()}>
+            <div className="mobile-more-header">
+              <h3>More Options</h3>
+              <button className="mobile-more-close" onClick={() => setMoreMenuOpen(false)}>✕</button>
+            </div>
+            <div className="mobile-more-content">
+              <NavLink 
+                to="/admin/dashboard/testimonials" 
+                className="mobile-more-item"
+                onClick={() => setMoreMenuOpen(false)}
+              >
+                <span className="mobile-more-icon">💬</span>
+                <span>Testimonials</span>
+              </NavLink>
+              <NavLink 
+                to="/admin/dashboard/blog" 
+                className="mobile-more-item"
+                onClick={() => setMoreMenuOpen(false)}
+              >
+                <span className="mobile-more-icon">📝</span>
+                <span>Blogs</span>
+              </NavLink>
+              <NavLink 
+                to="/admin/dashboard/analytics" 
+                className="mobile-more-item"
+                onClick={() => setMoreMenuOpen(false)}
+              >
+                <span className="mobile-more-icon">📈</span>
+                <span>Analytics</span>
+              </NavLink>
+              <NavLink 
+                to="/admin/dashboard/leads" 
+                className="mobile-more-item"
+                onClick={() => setMoreMenuOpen(false)}
+              >
+                <span className="mobile-more-icon">💼</span>
+                <span>Leads</span>
+              </NavLink>
+              <NavLink 
+                to="/admin/dashboard/content" 
+                className="mobile-more-item"
+                onClick={() => setMoreMenuOpen(false)}
+              >
+                <span className="mobile-more-icon">📱</span>
+                <span>Content</span>
+              </NavLink>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ================= STYLES ================= */}
       <style>{`
@@ -229,6 +305,30 @@ const Dashboard = () => {
           border-color: rgba(245, 158, 11, 0.35);
         }
 
+        /* Testimonials accent — purple */
+        .footer-nav-btn--testimonials:hover,
+        .footer-nav-btn--testimonials.active {
+          background: rgba(168, 85, 247, 0.10);
+          color: #a855f7;
+          border-color: rgba(168, 85, 247, 0.35);
+        }
+
+        /* Blogs accent — green */
+        .footer-nav-btn--blogs:hover,
+        .footer-nav-btn--blogs.active {
+          background: rgba(34, 197, 94, 0.10);
+          color: #16a34a;
+          border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        /* Analytics accent — blue */
+        .footer-nav-btn--analytics:hover,
+        .footer-nav-btn--analytics.active {
+          background: rgba(59, 130, 246, 0.10);
+          color: #2563eb;
+          border-color: rgba(59, 130, 246, 0.35);
+        }
+
         .footer-btn-icon { font-size: 14px; flex-shrink: 0; }
 
         .logout-btn {
@@ -252,6 +352,11 @@ const Dashboard = () => {
           background: var(--li-text-main);
           color: #FFFFFF;
           border-color: var(--li-text-main);
+        }
+
+        /* Hide the new mobile button on desktop */
+        .mobile-more-trigger {
+          display: none;
         }
 
         /* ── Main content ── */
@@ -284,10 +389,120 @@ const Dashboard = () => {
 
         .content-wrapper { padding: 40px 48px; position: relative; z-index: 10; }
 
+        /* ── Mobile More Menu ── */
+        .mobile-more-overlay {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+          z-index: 2000;
+          animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+
+        .mobile-more-menu {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: rgba(255, 255, 255, 0.98);
+          backdrop-filter: blur(20px);
+          border-top-left-radius: 24px;
+          border-top-right-radius: 24px;
+          box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+          animation: slideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+          max-height: 70vh;
+          overflow-y: auto;
+        }
+
+        .mobile-more-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px 20px 16px;
+          border-bottom: 1px solid var(--li-border);
+        }
+
+        .mobile-more-header h3 {
+          font-size: 18px;
+          font-weight: 800;
+          margin: 0;
+        }
+
+        .mobile-more-close {
+          background: var(--li-bg);
+          border: none;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .mobile-more-close:hover {
+          background: var(--li-border);
+          transform: rotate(90deg);
+        }
+
+        .mobile-more-content {
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .mobile-more-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 14px 16px;
+          border-radius: 12px;
+          background: var(--li-bg);
+          border: 1px solid var(--li-border);
+          text-decoration: none;
+          color: var(--li-text-main);
+          font-weight: 600;
+          font-size: 15px;
+          transition: all 0.2s ease;
+        }
+
+        .mobile-more-item:hover,
+        .mobile-more-item.active {
+          background: rgba(62, 24, 249, 0.08);
+          color: var(--li-purple);
+          border-color: rgba(62, 24, 249, 0.25);
+          transform: translateX(4px);
+        }
+
+        .mobile-more-icon {
+          font-size: 22px;
+          flex-shrink: 0;
+        }
+
         /* ── Responsive Mobile Bottom Bar ── */
         @media (max-width: 768px) {
           .dashboard-container { flex-direction: column; }
           
+          /* Show More Menu Overlay on Mobile */
+          .mobile-more-overlay {
+            display: flex;
+            align-items: flex-end;
+          }
+
           /* Transform sidebar to fixed bottom glass bar */
           .sidebar {
             width: 100%; height: auto; border-right: none;
@@ -305,6 +520,16 @@ const Dashboard = () => {
           /* Hide unneeded elements on mobile */
           .sidebar-header, .nav-group-title { display: none; }
 
+          /* Hide certain nav items on mobile (show only 5 + More) */
+          .sidebar-nav .nav-item:not(:first-child) { display: none; } /* Hide Leads, Content */
+
+          /* Hide extra footer items, keep only Profile, Skills, Certs, Projects, Logout */
+          .footer-nav-btn--testimonials,
+          .footer-nav-btn--blogs,
+          .footer-nav-btn--analytics {
+            display: none;
+          }
+
           /* Magic layout trick: makes list items direct flex children of sidebar */
           .sidebar-nav, .sidebar-footer { display: contents; }
 
@@ -313,7 +538,7 @@ const Dashboard = () => {
             width: auto; min-width: 44px; padding: 6px; margin: 0;
             border: none; background: transparent !important;
             flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: none !important;
+            box-shadow: none !important; position: relative;
           }
           
           .nav-text { display: none; }
@@ -328,6 +553,22 @@ const Dashboard = () => {
           .footer-nav-btn.active .footer-btn-icon {
             transform: translateY(-4px) scale(1.15);
             filter: drop-shadow(0 4px 6px rgba(62, 24, 249, 0.3));
+          }
+
+          /* Show the actual button instead of CSS pseudo-element */
+          .mobile-more-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            color: var(--li-text-muted);
+            background: transparent;
+            border: none;
+            order: 999; /* Forces the button to be the last item on the right */
+            transition: all 0.2s ease;
           }
 
           .content-wrapper { padding: 24px 16px 100px; } /* Prevent content from hiding behind the bottom nav */
