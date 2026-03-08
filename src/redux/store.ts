@@ -13,6 +13,13 @@ import { skillApi } from "./services/skillApi";
 import { certificateApi } from "./services/certificateApi";
 import { contactApi } from "./services/contactApi";
 
+import { experienceApi } from "./services/experienceApi";
+import { educationApi } from "./services/educationApi";
+import { achievementApi } from "./services/achievementApi";
+import { analyticsApi } from "./services/analyticsApi";
+import { blogApi } from "./services/blogApi";
+import { testimonialApi } from "./services/testimonialApi";
+
 /* ---------------- Store ---------------- */
 
 export const store = configureStore({
@@ -27,6 +34,13 @@ export const store = configureStore({
     [skillApi.reducerPath]: skillApi.reducer,
     [certificateApi.reducerPath]: certificateApi.reducer,
     [contactApi.reducerPath]: contactApi.reducer,
+
+    [experienceApi.reducerPath]: experienceApi.reducer,
+    [educationApi.reducerPath]: educationApi.reducer,
+    [achievementApi.reducerPath]: achievementApi.reducer,
+    [analyticsApi.reducerPath]: analyticsApi.reducer,
+    [blogApi.reducerPath]: blogApi.reducer,
+    [testimonialApi.reducerPath]: testimonialApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -36,7 +50,14 @@ export const store = configureStore({
       projectApi.middleware,
       skillApi.middleware,
       certificateApi.middleware,
-      contactApi.middleware
+      contactApi.middleware,
+
+      experienceApi.middleware,
+      educationApi.middleware,
+      achievementApi.middleware,
+      analyticsApi.middleware,
+      blogApi.middleware,
+      testimonialApi.middleware
     ),
 });
 

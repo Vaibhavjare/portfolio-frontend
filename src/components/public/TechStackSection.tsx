@@ -37,7 +37,7 @@ const TiltCard = ({
     const r = el.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width  - 0.5;
     const y = (e.clientY - r.top)  / r.height - 0.5;
-    el.style.transform = `perspective(600px) rotateY(${x * 16}deg) rotateX(${-y * 16}deg) translateZ(12px) scale(1.03)`;
+    el.style.transform = `perspective(600px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(8px) scale(1.02)`;
   };
   const onLeave = () => {
     const el = ref.current; if (!el) return;
@@ -51,30 +51,24 @@ const TiltCard = ({
   );
 };
 
-/* ─── Animated proficiency bar ─── */
+/* ─── Animated proficiency bar (Bottom Edge) ─── */
 const ProfBar = ({ pct, color, delay = 0 }: { pct: number; color: string; delay?: number }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
   useEffect(() => {
     const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setTimeout(() => setW(pct), delay * 1000 + 200); obs.disconnect(); }
-    }, { threshold: 0.3 });
+      if (e.isIntersecting) { setTimeout(() => setW(pct), delay * 1000 + 100); obs.disconnect(); }
+    }, { threshold: 0.1 });
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, [pct, delay]);
+  
   return (
-    <div ref={ref} style={{ height: 3, background: "rgba(0,0,0,0.06)", borderRadius: 999, overflow: "hidden", marginTop: 4 }}>
-      <div style={{
-        height: "100%", width: `${w}%`, background: color,
-        borderRadius: 999, transition: "width 1s cubic-bezier(.22,1,.36,1)",
-        position: "relative", overflow: "hidden",
-      }}>
-        <span style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent)",
-          animation: "ts-shimmer 1.8s ease-in-out infinite",
-        }} />
-      </div>
+    <div ref={ref} className="skill-badge-bar-wrap">
+      <div
+        className="skill-badge-bar"
+        style={{ width: `${w}%`, background: color }}
+      />
     </div>
   );
 };
@@ -86,16 +80,9 @@ const PROF_COL: Record<string, string> = {
   Beginner: "#94a3b8", Elementary: "#38bdf8", Intermediate: "#f59e0b",
   Advanced: "#22c55e", Expert: "#3E18F9",
 };
-const CAT_ICONS: Record<string, string> = {
-  "AI / ML": "🤖", "Machine Learning": "🧠", "Deep Learning": "🧬",
-  "Frontend": "🎨", "Backend": "⚙️", "Database": "🗄️",
-  "Cloud": "☁️", "DevOps": "🔧", "Mobile": "📱",
-  "Languages": "💻", "Tools": "🛠️", "Other": "⚡",
-};
 
 const TechStackSection = () => {
   const { data: allSkills = [], isLoading } = useGetSkillsQuery({});
-  const [activeCategory, setActiveCategory] = useState("All");
 
   const active = useMemo(() => allSkills.filter(s => s.is_active !== false), [allSkills]);
 
@@ -107,19 +94,12 @@ const TechStackSection = () => {
       if (!map[cat]) map[cat] = [];
       map[cat].push(s);
     });
-    /* sort within each category by display_order or rating */
+    /* Sort within each category */
     Object.keys(map).forEach(k => {
       map[k].sort((a, b) => (a.display_order ?? 99) - (b.display_order ?? 99) || (b.rating ?? 0) - (a.rating ?? 0));
     });
     return map;
   }, [active]);
-
-  const categories = ["All", ...Object.keys(byCategory)];
-
-  const displayed = useMemo(() =>
-    activeCategory === "All" ? byCategory
-      : { [activeCategory]: byCategory[activeCategory] ?? [] },
-    [activeCategory, byCategory]);
 
   if (isLoading) return (
     <section className="section bg-light-grey" id="skills">
@@ -133,74 +113,45 @@ const TechStackSection = () => {
     <section className="section bg-light-grey" id="skills">
 
       <Reveal className="section-header">
+        <p className="section-eyebrow">EXPERTISE</p>
         <h2>Tech <span className="gradient-text">Stack</span></h2>
         <p className="subtitle" style={{ margin: "12px auto 0" }}>
-          {active.length} skills across {Object.keys(byCategory).length} domains
+          {active.length} skills across {Object.keys(byCategory).length} categories
         </p>
       </Reveal>
 
-      {/* Category filter pills */}
-      {categories.length > 2 && (
-        <Reveal delay={0.08} style={{ marginBottom: 36, display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8 }}>
-          {categories.map((cat, i) => (
-            <button
-              key={cat}
-              className={`ts-pill${activeCategory === cat ? " ts-pill-active" : ""}`}
-              style={{ animationDelay: `${i * 0.04}s` }}
-              onClick={() => setActiveCategory(cat)}
-            >
-              {CAT_ICONS[cat] || "◈"} {cat}
-              {cat !== "All" && <span className="ts-pill-count">{byCategory[cat]?.length}</span>}
-            </button>
-          ))}
-        </Reveal>
-      )}
-
-      {/* Skills by category */}
+      {/* Categories & Skills Grid */}
       <div style={{ width: "100%", maxWidth: 1100, display: "flex", flexDirection: "column", gap: 40 }}>
-        {Object.entries(displayed).map(([cat, skills], catIdx) => (
-          <Reveal key={cat} delay={catIdx * 0.06}>
-            <div className="ts-cat-block">
-              <div className="ts-cat-header">
-                <span className="ts-cat-icon">{CAT_ICONS[cat] || "◈"}</span>
-                <h3 className="ts-cat-title">{cat}</h3>
-                <span className="ts-cat-count">{skills.length}</span>
-              </div>
-
+        {Object.entries(byCategory).map(([cat, skills], catIdx) => (
+          <Reveal key={cat} delay={catIdx * 0.08}>
+            <div className="skill-category-block">
+              <h3 className="skill-cat-title">{cat}</h3>
+              
               <div className="skills-grid">
                 {skills.map((s, i) => {
                   const accent = s.color || PROF_COL[s.proficiency_level || ""] || "#3E18F9";
-                  const pct    = PROF_PCT[s.proficiency_level || ""] ?? (s.rating != null ? s.rating * 10 : null);
+                  const pct = s.rating != null ? (s.rating / 10) * 100 : (PROF_PCT[s.proficiency_level || ""] || 0);
+
                   return (
-                    <TiltCard key={s.skill_id} className="ts-badge">
-                      <div className="ts-badge-inner" style={{ "--accent": accent } as React.CSSProperties}>
-
-                        {/* Left — icon or letter */}
-                        <div className="ts-badge-icon-wrap" style={{ background: accent + "1A" }}>
-                          {s.icon_url
-                            ? <img src={s.icon_url} alt={s.name} className="ts-icon-img" />
-                            : <span className="ts-icon-letter" style={{ color: accent }}>{s.name.charAt(0)}</span>
-                          }
-                        </div>
-
-                        {/* Right — name + meta */}
-                        <div className="ts-badge-text">
-                          <span className="ts-badge-name">{s.name}</span>
-                          {s.years_of_experience != null && (
-                            <span className="ts-badge-yrs">{s.years_of_experience}y exp</span>
-                          )}
-                          {s.proficiency_level && (
-                            <span className="ts-badge-level" style={{ color: accent }}>
-                              {s.proficiency_level}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Bottom proficiency bar */}
-                        {pct != null && <ProfBar pct={pct} color={accent} delay={catIdx * 0.06 + i * 0.03} />}
-
-                        {/* Shimmer sweep */}
-                        <div className="ts-shine" />
+                    <TiltCard key={s.skill_id} className="skill-badge-3d">
+                      <div 
+                        className="skill-badge-inner" 
+                        style={{ "--accent": accent, borderColor: `${accent}33` } as React.CSSProperties}
+                      >
+                        {/* Icon or Letter */}
+                        {s.icon_url ? (
+                          <img src={s.icon_url} alt={s.name} className="skill-icon-img" />
+                        ) : (
+                          <span className="skill-icon-letter" style={{ color: accent }}>
+                            {s.name.charAt(0)}
+                          </span>
+                        )}
+                        
+                        {/* Skill Name */}
+                        <span className="skill-badge-name">{s.name}</span>
+                        
+                        {/* Bottom Progress Bar */}
+                        {pct > 0 && <ProfBar pct={pct} color={accent} delay={catIdx * 0.08 + i * 0.04} />}
                       </div>
                     </TiltCard>
                   );
@@ -215,17 +166,16 @@ const TechStackSection = () => {
       {active.length === 0 && !isLoading && (
         <Reveal>
           <div className="skills-grid" style={{ maxWidth: 900 }}>
-            {["Python & FastAPI","Machine Learning","React & TypeScript","MongoDB & MySQL","Agentic AI & LLMs","Cloud Deployment"].map(s => (
-              <div key={s} className="skill-badge">{s}</div>
+            {["Python", "Machine Learning", "React", "MongoDB", "Agentic AI", "Git"].map(s => (
+              <div key={s} className="skill-badge-fallback">{s}</div>
             ))}
           </div>
         </Reveal>
       )}
 
       <style>{`
-        @keyframes ts-shimmer { 0%{transform:translateX(-100%)skewX(-15deg)} 100%{transform:translateX(220%)skewX(-15deg)} }
+        @keyframes ts-shimmer { 0%{transform:translateX(-100%) skewX(-15deg)} 100%{transform:translateX(220%) skewX(-15deg)} }
         @keyframes ts-dot     { 0%,80%,100%{transform:scale(0);opacity:0.3} 40%{transform:scale(1);opacity:1} }
-        @keyframes ts-pill-pop{ from{opacity:0;transform:scale(0.8) translateX(-6px)} to{opacity:1;transform:none} }
 
         /* Loader */
         .ts-loader { display:flex; gap:8px; padding:80px 0; justify-content:center; align-items:center; }
@@ -236,75 +186,65 @@ const TechStackSection = () => {
         .ts-loader-dot:nth-child(2){animation-delay:0.16s;}
         .ts-loader-dot:nth-child(3){animation-delay:0.32s;}
 
-        /* Category filter pills */
-        .ts-pill {
-          padding:7px 14px; border-radius:999px; border:1px solid var(--li-border);
-          background:white; color:var(--li-text-muted); font-size:12px; font-weight:700;
-          cursor:pointer; display:inline-flex; align-items:center; gap:5px;
-          font-family:'IBM Plex Mono',monospace;
-          opacity:0; animation:ts-pill-pop 0.35s cubic-bezier(.34,1.56,.64,1) both;
-          transition:all 0.18s ease;
+        /* Category Layout */
+        .skill-category-block { width:100%; }
+        .skill-cat-title {
+          font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:800;
+          color:var(--li-purple); text-transform:uppercase; letter-spacing:0.10em;
+          margin:0 0 16px; padding-bottom:8px; border-bottom:1px solid rgba(62,24,249,.15);
         }
-        .ts-pill:hover         { border-color:var(--li-purple); color:var(--li-purple); transform:translateY(-1px); }
-        .ts-pill-active        { background:var(--li-purple); color:white; border-color:var(--li-purple); box-shadow:0 4px 14px rgba(62,24,249,0.28); }
-        .ts-pill-active:hover  { color:white; }
-        .ts-pill-count         { background:rgba(255,255,255,0.25); border-radius:999px; padding:1px 6px; font-size:10px; }
-        .ts-pill-active .ts-pill-count { background:rgba(255,255,255,0.22); }
-
-        /* Category block */
-        .ts-cat-block { width:100%; }
-        .ts-cat-header {
-          display:flex; align-items:center; gap:10px; margin-bottom:18px;
-          padding-bottom:12px; border-bottom:1px solid rgba(62,24,249,0.10);
-        }
-        .ts-cat-icon  { font-size:20px; }
-        .ts-cat-title {
-          font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:800;
-          color:var(--li-purple); text-transform:uppercase; letter-spacing:0.08em; margin:0;
-        }
-        .ts-cat-count {
-          margin-left:auto; background:rgba(62,24,249,0.08); color:var(--li-purple);
-          font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:800;
-          padding:3px 9px; border-radius:999px;
-        }
-
-        /* Skill badge */
-        .ts-badge { cursor:default; }
-        .ts-badge-inner {
-          position:relative; overflow:hidden;
-          background:white; border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);
-          border-radius:12px; padding:12px 14px;
-          box-shadow:0 3px 10px rgba(0,0,0,0.04);
-          display:flex; flex-direction:column; gap:4px;
-          min-width:130px;
-        }
-        .ts-badge-inner:hover { border-color:color-mix(in srgb,var(--accent) 50%,transparent); }
-
-        .ts-badge-icon-wrap {
-          width:36px; height:36px; border-radius:9px; flex-shrink:0;
-          display:flex; align-items:center; justify-content:center; margin-bottom:6px;
-        }
-        .ts-icon-img    { width:24px; height:24px; object-fit:contain; }
-        .ts-icon-letter { font-size:18px; font-weight:900; line-height:1; }
-
-        .ts-badge-text { display:flex; flex-direction:column; gap:2px; }
-        .ts-badge-name {
-          font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:700;
-          color:var(--li-text-main); line-height:1.2;
-        }
-        .ts-badge-yrs   { font-size:10px; font-weight:700; color:var(--li-text-muted); font-family:'IBM Plex Mono',monospace; }
-        .ts-badge-level { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; font-family:'IBM Plex Mono',monospace; }
-
-        /* Shine sweep */
-        .ts-shine {
-          position:absolute; top:-40%; left:-40%; width:50%; height:180%;
-          background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);
-          transform:skewX(-15deg);
-          animation:ts-shimmer 2.8s ease-in-out infinite;
-        }
-
-        /* Inherit parent skills-grid */
+        
         .skills-grid { display:flex; flex-wrap:wrap; gap:12px; }
+
+        /* Skill Pill Layout */
+        .skill-badge-3d { cursor:default; }
+        
+        .skill-badge-inner {
+          display:flex; align-items:center; gap:10px; background:white;
+          border-radius:10px; border:1px solid; padding:10px 16px;
+          min-width:130px; box-shadow:0 4px 12px rgba(0,0,0,.04);
+          position:relative; overflow:hidden;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .skill-badge-inner:hover {
+          border-color: color-mix(in srgb, var(--accent) 70%, transparent) !important;
+          box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 15%, transparent);
+        }
+        
+        /* Shimmer sweep effect */
+        .skill-badge-inner::after {
+          content:""; position:absolute; top:-40%; left:-40%; width:50%; height:180%;
+          background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
+          transform:skewX(-15deg); animation:ts-shimmer 3s ease-in-out infinite;
+        }
+
+        .skill-icon-img { width:20px; height:20px; object-fit:contain; flex-shrink:0; }
+        .skill-icon-letter {
+          width:20px; height:20px; flex-shrink:0; font-size:14px; font-weight:900;
+          display:flex; align-items:center; justify-content:center;
+        }
+
+        .skill-badge-name {
+          font-size:13px; font-weight:700; font-family:'IBM Plex Mono',monospace;
+          padding-bottom:1px;
+        }
+
+        /* Bottom Proficiency Bar */
+        .skill-badge-bar-wrap {
+          position:absolute; bottom:0; left:0; right:0; height:3px;
+          background:rgba(0,0,0,.05); border-radius:0 0 10px 10px; overflow:hidden;
+        }
+        .skill-badge-bar {
+          height:100%; border-radius:0 0 10px 10px;
+          transition: width 1s cubic-bezier(.22,1,.36,1);
+        }
+
+        /* Fallback Pill */
+        .skill-badge-fallback {
+          font-family:'IBM Plex Mono',monospace; background:white; color:var(--li-text-main);
+          padding:12px 20px; border-radius:8px; font-weight:600; font-size:13px;
+          border:1px solid var(--li-border); box-shadow:0 2px 8px rgba(0,0,0,.02);
+        }
       `}</style>
     </section>
   );

@@ -11,6 +11,10 @@ import ProfileSettings      from "./components/admin/ProfileSettings";
 import ProjectManagement    from "./components/admin/ProjectManagement";
 import SkillsManager        from "./components/admin/SkillManagement";
 import CertificatesManager  from "./components/admin/Certificatesmanager"; // ← NEW
+import AnalyticsDashboard   from "./components/admin/Analyticsdashboard";
+import BlogManagement       from "./components/admin/Blogmanagement";
+import TestimonialManagement from "./components/admin/Testimonialmanagement";
+
 
 // Components
 import Navbar        from "./components/Navbar";
@@ -67,6 +71,9 @@ function App() {
 
         {/* /admin/dashboard/certificates */}
         <Route path="certificates" element={<CertificatesManager />} />
+        <Route path="analytics" element={<AnalyticsDashboard />} />
+        <Route path="blog" element={<BlogManagement />} />
+        <Route path="testimonials" element={<TestimonialManagement />} /> 
 
         {/* Placeholders */}
         <Route path="leads"   element={<PlaceholderPage title="Freelance Leads" />} />
