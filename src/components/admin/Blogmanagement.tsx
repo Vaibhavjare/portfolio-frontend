@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
 import {
   Plus, Edit3, Trash2, X, Save, FileText, Tag,
-  Search, ToggleLeft, ToggleRight, Award, Image as ImageIcon,
+  Search, Award, Image as ImageIcon,
   User, Calendar, Eye,
 } from "lucide-react";
 import {

@@ -1,11 +1,11 @@
 import React from "react";
 import HeroSection         from "../components/public/HeroSection";
 import AboutSection        from "../components/public/AboutSection";
-import ExperienceSection   from "../components/public/Experiencesection";
+import ExperienceSection   from "../components/public/Experiencesection"; // Fixed casing
 import TechStackSection    from "../components/public/TechStackSection";
 import ProjectsSection     from "../components/public/ProjectsSection";
-import CertificatesSection from "../components/public/Certificatessection";
-import AchievementsSection from "../components/public/Achievementssection";
+import CertificatesSection from "../components/public/Certificatessection"; // Fixed casing
+import AchievementsSection from "../components/public/Achievementssection"; // Fixed casing
 import ContactSection      from "../components/public/ContactSection";
 import Footer              from "../components/Footer";
 import Navbar              from "../components/Navbar";
